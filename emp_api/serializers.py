@@ -2,12 +2,12 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from .models import User
+from .models import CompanyUser
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CompanyUser
         fields = (
             'email',
             'first_name',
@@ -28,13 +28,39 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if validated_data['role'] == "SUPERUSER":
-            auth_user = User.objects.create_superuser(**validated_data)
+            auth_user = CompanyUser.objects.create_superuser(**validated_data)
             return auth_user
         elif validated_data['role'] == "MANAGER":
-            auth_user = User.objects.create_user(**validated_data)
+            auth_user = CompanyUser.objects.create_user(**validated_data)
             return auth_user
         else:
             self.fail('bad_request')
+
+
+class EmpRegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyUser
+        fields = (
+            'email',
+            'first_name',
+            'last_name',
+            'date_of_birth',
+            'address',
+            'contact_number',
+            'role',
+        )
+
+    default_error_messages = {
+        'bad_request': 'SuperUser/Manager cannot be created from this form!'
+    }
+
+    def create(self, validated_data):
+        if validated_data['role'] == "SUPERUSER" or validated_data['role'] == "MANAGER":
+            self.fail('bad_request')
+        else:
+            auth_user = CompanyUser.objects.create_user(**validated_data,
+                                                        password=CompanyUser.objects.make_random_password())
+            return auth_user
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -70,13 +96,36 @@ class UserLoginSerializer(serializers.Serializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CompanyUser
         fields = (
             'email',
             'first_name',
             'last_name',
             'role',
         )
+
+
+class EmpListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyUser
+        fields = (
+            'email',
+            'first_name',
+            'last_name',
+            'role',
+        )
+
+
+class EmpUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyUser
+        fields = ('id',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'date_of_birth',
+                  'address',
+                  'contact_number', )
 
 
 # Logout Serializer for blacklisting refresh token on User Logout

@@ -2,13 +2,12 @@ from django.db import models
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils import timezone
-from django.core.validators import RegexValidator
 
 from .managers import CustomUserManager
 
 
 # Create your models here.
-class User(AbstractBaseUser, PermissionsMixin):
+class CompanyUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ("SUPERUSER", 'Super User'),
         ("MANAGER", 'Manager'),

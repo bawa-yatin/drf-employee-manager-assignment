@@ -5,6 +5,10 @@ from .views import (
     SuperUserManagerRegistration,
     UserLoginAPIView,
     GetUserListView,
+    EmpRegistration,
+    GetEmpListView,
+    UpdateEmpView,
+    DeleteEmpView,
     LogoutAPI
 )
 
@@ -14,5 +18,9 @@ urlpatterns = [
     path('register', SuperUserManagerRegistration.as_view(), name='register'),
     path('login', UserLoginAPIView.as_view(), name='login'),
     path('users', GetUserListView.as_view(), name='users'),
+    path('emp/register', EmpRegistration.as_view(), name='emp_register'),
+    path('emp/all', GetEmpListView.as_view(), name='emp_list'),
+    path('emp/delete/<pk>', DeleteEmpView.as_view(), name='user-delete'),
+    path('emp/update/<pk>', UpdateEmpView.as_view(), name='user-update'),
     path('logout', LogoutAPI.as_view(), name='logout'),
 ]

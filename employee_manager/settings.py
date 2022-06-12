@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-AUTH_USER_MODEL = 'emp_api.User'
+AUTH_USER_MODEL = 'emp_api.CompanyUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
