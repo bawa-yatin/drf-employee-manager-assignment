@@ -24,7 +24,7 @@ class CompanyUser(AbstractBaseUser, PermissionsMixin):
     date_of_birth = models.DateField()
     address = models.CharField(max_length=200, blank=False)
     contact_number = models.CharField(unique=True, max_length=10)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=False, null=False, default="SUPERUSER")
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=False, default="SUPERUSER")
     date_joined = models.DateTimeField(auto_now_add=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
