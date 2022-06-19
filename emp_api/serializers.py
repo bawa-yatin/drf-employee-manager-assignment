@@ -1,17 +1,16 @@
-import pytz
-from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
-from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils import timezone
-from django.conf import settings
+from django.utils.encoding import smart_str, force_bytes
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+
 from .models import CompanyUser
 from .utils import Util
 
 
+# Serializer class for creating SuperUser/Manager
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyUser
@@ -44,6 +43,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             self.fail('bad_request')
 
 
+# Serializer class for logging into the account(for every registered user)
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=128, write_only=True)
@@ -75,6 +75,8 @@ class UserLoginSerializer(serializers.Serializer):
             return login_data
 
 
+# Serializer class for getting list of all Managers registered(Can be accessed by
+# SuperUser only)
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyUser
@@ -86,6 +88,8 @@ class UserListSerializer(serializers.ModelSerializer):
         )
 
 
+# Serializer class for creating new Employee(Can be done by registered Managers only)
+# SuperUser or Manager cannot be created from here
 class EmpRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyUser
@@ -123,12 +127,16 @@ class EmpRegistrationSerializer(serializers.ModelSerializer):
             return auth_user
 
 
+# Serializer class for getting profile details of logged-in user(Can be accessed by
+# all types of users)
 class EmpProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyUser
         fields = ['id', 'email', 'first_name', 'last_name', 'date_of_birth', 'contact_number', 'role']
 
 
+# Serializer class for getting list of all Employees registered(Can be accessed by
+# Manager only)
 class EmpListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyUser
@@ -140,6 +148,8 @@ class EmpListSerializer(serializers.ModelSerializer):
         )
 
 
+# Serializer class for updating details of an existing employee(Can be performed by
+# Manager only)
 class EmpUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyUser
@@ -152,6 +162,7 @@ class EmpUpdateSerializer(serializers.ModelSerializer):
                   'contact_number',)
 
 
+# Serializer class for sending a reset password link in case of forgotten password
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255)
 
@@ -183,6 +194,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
             self.fail('bad_user')
 
 
+# Serializer class for resetting password using link received
 class ResetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(
         max_length=255, style={'input_type': 'password'}, write_only=True)
@@ -209,13 +221,8 @@ class ResetPasswordSerializer(serializers.Serializer):
         id = smart_str(urlsafe_base64_decode(uid))
         user = CompanyUser.objects.get(id=id)
 
-        # utc_now = timezone.now()
-        # utc_now = utc_now.replace(tzinfo=pytz.utc)
-
         if not PasswordResetTokenGenerator().check_token(user, token):
             self.fail('bad_token')
-        # elif token.created < utc_now - settings.TOKEN_TTL:
-        #     self.fail('bad_token')
 
         user.set_password(password)
         user.save()

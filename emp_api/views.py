@@ -31,6 +31,8 @@ def get_tokens_after_user_registration(user):
     })
 
 
+# View class for registration of SuperUser/Manager. Access and refresh token will
+# be generated on successful registration
 class SuperUserManagerRegistration(CreateAPIView):
     serializer_class = UserRegistrationSerializer
 
@@ -57,6 +59,8 @@ class SuperUserManagerRegistration(CreateAPIView):
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
+# View class for every user to log into his account by providing credentials
+# Access and refresh token will be generated on successful login
 class UserLoginAPIView(GenericAPIView):
     serializer_class = UserLoginSerializer
 
@@ -85,6 +89,8 @@ class UserLoginAPIView(GenericAPIView):
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
+# View class for getting list of all Managers registered(Can be accessed by
+# SuperUser only)
 class GetUserListView(ListAPIView):
     serializer_class = UserListSerializer
     permission_classes = (IsAuthenticated,)
@@ -114,6 +120,8 @@ class GetUserListView(ListAPIView):
                 return Response({'message': 'No users available in this category!'}, status=status.HTTP_204_NO_CONTENT)
 
 
+# View class for creating new Employee(Can be done by registered Managers only)
+# Employee will get login credentials on his email address after registration
 class EmpRegistration(CreateAPIView):
     serializer_class = EmpRegistrationSerializer
     permission_classes = (IsAuthenticated,)
@@ -150,6 +158,8 @@ class EmpRegistration(CreateAPIView):
                 return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
+# View class for getting list of all Employees registered(Can be performed by
+# Manager only)
 class GetEmpListView(ListAPIView):
     serializer_class = EmpListSerializer
     permission_classes = (IsAuthenticated,)
@@ -179,6 +189,8 @@ class GetEmpListView(ListAPIView):
                 return Response({'message': 'No users available in this category!'}, status=status.HTTP_204_NO_CONTENT)
 
 
+# View class for updating details of an existing employee(Can be performed by
+# Manager only)
 class UpdateEmpView(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = EmpUpdateSerializer
@@ -219,6 +231,8 @@ class UpdateEmpView(UpdateAPIView):
             return Response(response, status=status.HTTP_200_OK)
 
 
+# View class for deleting an existing employee(Can be performed by
+# Manager only)
 class DeleteEmpView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
 
@@ -237,6 +251,8 @@ class DeleteEmpView(DestroyAPIView):
             return Response({'message': 'Employee Deleted Successfully!'}, status.HTTP_204_NO_CONTENT)
 
 
+# Serializer class for getting profile details of logged-in user(Can be accessed by
+# all types of authenticated users)
 class GetEmpProfile(ListAPIView):
     permission_classes = (IsAuthenticated,)
 
@@ -252,6 +268,7 @@ class GetEmpProfile(ListAPIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
+# View class for sending a reset password link in case of forgotten password
 class ForgotPassword(GenericAPIView):
     def post(self, request):
         serializer = ForgotPasswordSerializer(data=request.data)
@@ -260,6 +277,7 @@ class ForgotPassword(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# View class for resetting password using link received
 class ResetPassword(GenericAPIView):
 
     def post(self, request, uid, token):
@@ -270,6 +288,7 @@ class ResetPassword(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# View class for blacklisting refresh token on User Logout
 class LogoutAPI(GenericAPIView):
     serializer_class = LogoutSerializer
     permission_classes = [IsAuthenticated, ]

@@ -43,5 +43,5 @@ class UserModelAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
-# Now register the new UserAdmin...
+# Registering the new UserAdmin...
 admin.site.register(CompanyUser, UserModelAdmin)
