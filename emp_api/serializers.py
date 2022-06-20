@@ -75,7 +75,7 @@ class UserLoginSerializer(serializers.Serializer):
             return login_data
 
 
-# Serializer class for getting list of all Managers registered(Can be accessed by
+# Serializer class for getting list of all Managers/Employees registered(Can be accessed by
 # SuperUser only)
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:

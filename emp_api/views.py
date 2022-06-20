@@ -89,7 +89,7 @@ class UserLoginAPIView(GenericAPIView):
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
-# View class for getting list of all Managers registered(Can be accessed by
+# View class for getting list of all Managers/Employees registered(Can be accessed by
 # SuperUser only)
 class GetUserListView(ListAPIView):
     serializer_class = UserListSerializer
@@ -105,7 +105,7 @@ class GetUserListView(ListAPIView):
             }
             return Response(response, status.HTTP_403_FORBIDDEN)
         else:
-            users = CompanyUser.objects.filter(role="MANAGER")
+            users = CompanyUser.objects.filter(is_superuser="False")
             if users.count() >= 1:
                 serializer = self.serializer_class(users, many=True)
                 response = {
