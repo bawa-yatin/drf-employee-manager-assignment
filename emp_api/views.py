@@ -141,8 +141,7 @@ class EmpRegistration(CreateAPIView):
             valid = serializer.is_valid(raise_exception=True)
 
             if valid:
-                user = serializer.save()
-                token = get_tokens_after_user_registration(user)
+                serializer.save()
                 status_code = status.HTTP_201_CREATED
 
                 response = {
@@ -150,7 +149,6 @@ class EmpRegistration(CreateAPIView):
                     'statusCode': status_code,
                     'message': 'Employee successfully registered! Please check mail for credentials!',
                     'user': serializer.data,
-                    'token': token
                 }
 
                 return Response(response, status=status_code)
@@ -186,7 +184,7 @@ class GetEmpListView(ListAPIView):
                 }
                 return Response(response, status=status.HTTP_200_OK)
             else:
-                return Response({'message': 'No users available in this category!'}, status=status.HTTP_204_NO_CONTENT)
+                return Response({'message': 'No employees available in this category!'}, status=status.HTTP_204_NO_CONTENT)
 
 
 # View class for updating details of an existing employee(Can be performed by
@@ -279,7 +277,6 @@ class ForgotPassword(GenericAPIView):
 
 # View class for resetting password using link received
 class ResetPassword(GenericAPIView):
-
     def post(self, request, uid, token):
         serializer = ResetPasswordSerializer(data=request.data, context={
             'uid': uid, 'token': token})

@@ -37,7 +37,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             auth_user = CompanyUser.objects.create_superuser(**validated_data)
             return auth_user
         elif validated_data['role'] == "MANAGER":
-            auth_user = CompanyUser.objects.create_user(**validated_data)
+            auth_user = CompanyUser.objects.create_manager(**validated_data)
             return auth_user
         else:
             self.fail('bad_request')
@@ -112,7 +112,7 @@ class EmpRegistrationSerializer(serializers.ModelSerializer):
             self.fail('bad_request')
         else:
             emp_password = CompanyUser.objects.make_random_password()
-            auth_user = CompanyUser.objects.create_user(**validated_data,
+            auth_user = CompanyUser.objects.create_emp(**validated_data,
                                                         password=emp_password)
 
             body = ''' Hi there...We're thrilled to have you on board! You can use the following credentials to log into your 

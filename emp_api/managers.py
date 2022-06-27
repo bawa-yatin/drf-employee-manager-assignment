@@ -6,7 +6,6 @@ class CustomUserManager(BaseUserManager):
     Custom user model where the email address is the unique identifier
     and has an is_admin field to allow access to the admin app
     """
-
     def _create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("The email must be set")
@@ -19,9 +18,18 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_manager(self, email, password, **extra_fields):
+        # Setting "is_superuser" attribute to False by default when
+        # creating a Manager
+        extra_fields.setdefault("is_superuser", False)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_active', True)
+
+        return self._create_user(email, password, **extra_fields)
+
+    def create_emp(self, email, password, **extra_fields):
         # Setting "is_superuser" and "is_staff" attribute to False by default when
-        # creating a Manager/Employee
+        # creating a Employee
         extra_fields.setdefault("is_superuser", False)
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_active', True)
