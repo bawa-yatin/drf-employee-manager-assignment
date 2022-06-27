@@ -154,12 +154,11 @@ class EmpUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyUser
         fields = ('id',
-                  'email',
                   'first_name',
                   'last_name',
                   'date_of_birth',
                   'address',
-                  'contact_number',)
+                  'contact_number')
 
 
 # Serializer class for sending a reset password link in case of forgotten password

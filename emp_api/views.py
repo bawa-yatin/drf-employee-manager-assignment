@@ -23,6 +23,7 @@ from .serializers import (
 )
 
 
+# Method for generating access and refresh token after successful registration
 def get_tokens_after_user_registration(user):
     refresh = RefreshToken.for_user(user)
     return ({
@@ -184,7 +185,8 @@ class GetEmpListView(ListAPIView):
                 }
                 return Response(response, status=status.HTTP_200_OK)
             else:
-                return Response({'message': 'No employees available in this category!'}, status=status.HTTP_204_NO_CONTENT)
+                return Response({'message': 'No employees available in this category!'},
+                                status=status.HTTP_204_NO_CONTENT)
 
 
 # View class for updating details of an existing employee(Can be performed by
@@ -208,7 +210,6 @@ class UpdateEmpView(UpdateAPIView):
             return Response(response, status.HTTP_403_FORBIDDEN)
         else:
             instance = self.get_object()
-            instance.email = request.data["email"]
             instance.first_name = request.data["first_name"]
             instance.last_name = request.data["last_name"]
             instance.date_of_birth = request.data["date_of_birth"]
@@ -229,8 +230,7 @@ class UpdateEmpView(UpdateAPIView):
             return Response(response, status=status.HTTP_200_OK)
 
 
-# View class for deleting an existing employee(Can be performed by
-# Manager only)
+# View class for deleting an existing employee(Can be performed by Manager only)
 class DeleteEmpView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
 
@@ -245,8 +245,14 @@ class DeleteEmpView(DestroyAPIView):
             return Response(response, status.HTTP_403_FORBIDDEN)
         else:
             user_id = self.kwargs["pk"]
-            CompanyUser.objects.filter(id=user_id).delete()
-            return Response({'message': 'Employee Deleted Successfully!'}, status.HTTP_204_NO_CONTENT)
+            user_profile = CompanyUser.objects.filter(id=user_id)
+            serializer = EmpProfileSerializer(user_profile, many=True)
+
+            if serializer.data[0]["role"] == "SUPERUSER" or serializer.data[0]["role"] == "MANAGER":
+                return Response({'message': 'You cannot delete any superuser or manager!'}, status.HTTP_403_FORBIDDEN)
+            else:
+                user_profile.delete()
+                return Response({'message': 'Employee Deleted Successfully!'}, status.HTTP_204_NO_CONTENT)
 
 
 # Serializer class for getting profile details of logged-in user(Can be accessed by
